@@ -7,9 +7,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
+  loading: boolean = false;
+
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  setResult(data: any): void {
+    this.loading = data.loading
   }
 
 }
