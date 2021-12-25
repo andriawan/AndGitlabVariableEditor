@@ -6,8 +6,12 @@
     <div *ngIf="loadingRepoDetail" class="mt-[16px]">
         <p>Loading...</p>
     </div>
-    <div *ngIf="!loadingRepoDetail" class="mt-[16px]">
-        <p>Repository Name: </p>
-        <pre>{{repoDetail | json}}</pre>
+    <div *ngIf="!loadingRepoDetail" class="mt-[16px] flex items-center w-full">
+        <div class="flex-1">
+            <p>Repository Name: <a class="underline text-blue-500" [href]="repoDetail.web_url">{{repoDetail.name}}</a></p>
+        </div>
+        <div>
+            <button-primary (click-action)="searchRepository()" [label]="'Show Value'"></button-primary>
+        </div>
     </div>
 </div>

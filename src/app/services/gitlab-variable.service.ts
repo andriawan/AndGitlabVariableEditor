@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { GitlabProject } from '../interfaces/gitlab-project';
+import { GitlabUser } from '../interfaces/gitlab-user';
 import { GitlabVar } from '../interfaces/gitlab-var';
 import { Config } from '../utils/config';
 import { ApiService } from './api.service';
@@ -20,7 +21,7 @@ export class GitlabVariableService extends ApiService {
   getProject(id_project: string, token: string):Observable<GitlabProject> {
     return this.http.get<GitlabProject>(this.getProjectsDetail(id_project), {
       headers: new HttpHeaders({
-        "PRIVATE-TOKEN": token
+        Authorization: `Bearer ${token}`
       })
     });
   }
@@ -47,6 +48,14 @@ export class GitlabVariableService extends ApiService {
         "Accept": "application/json"
       })
     });
+  }
+
+  getLoggedUser(token:string): Observable<GitlabUser> {
+    return this.http.get<GitlabUser>(this.getUser(), {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    })
   }
 
 }

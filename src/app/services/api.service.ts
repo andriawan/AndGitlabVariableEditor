@@ -31,4 +31,8 @@ export class ApiService {
   postCodeAuthGitlab(): string {
     return `${this.mainUrl}/oauth/token`;
   }
+
+  getUser(): string {
+    return `${this.url}${this.version}/user`;
+  }
 } 
