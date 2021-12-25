@@ -1,23 +1,15 @@
-<div class="min-h-screen flex flex-col">
-    <navbar class="flex-none"></navbar>
+<div class="min-h-screen relative flex flex-col">
+    <navbar class="flex-none sticky top-0"></navbar>
     <div class="flex-1 overflow-y-auto flex flex-col justify-start max-w-4xl mx-auto container">
         <search-repository (search)=setResult($event) class="w-full"></search-repository>
-        <div *ngIf="loading">
+        <div *ngIf="result.loading">
             loading...
         </div>
-        <div *ngIf="!loading" class="flex flex-col">
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
-            <single-var-gitlab class="mb-6"></single-var-gitlab>
+        <div *ngIf="!result.loading && !result.error" class="flex flex-col">
+            <single-var-gitlab *ngFor="let data of result.data" [item]="data"  class="mb-6"></single-var-gitlab>
+        </div>
+        <div *ngIf="!result.loading && result.error" class="flex items-center justify-center text-red-500">
+            {{ result.error.statusText }}
         </div>
     </div>
     <footer class="flex-none"></footer>

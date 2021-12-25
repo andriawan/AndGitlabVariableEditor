@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SearchResult } from 'src/app/interfaces/search-result';
 
 @Component({
   selector: 'app-dashboard',
@@ -7,15 +8,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
-  loading: boolean = false;
+  result: SearchResult = {loading : false};
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-  setResult(data: any): void {
-    this.loading = data.loading
+  setResult(data: SearchResult): void {
+    this.result = data
   }
 
 }

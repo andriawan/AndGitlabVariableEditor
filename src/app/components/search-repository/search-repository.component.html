@@ -1,9 +1,13 @@
 <div class="flex flex-col items-center py-6">
     <div class="flex w-full flex-row">
-        <input-primary (change)="setText($event)" class="flex-1"></input-primary>
+        <input-primary [placeholder]="'PROJECT ID'" (change)="setText($event)" class="flex-1"></input-primary>
         <button-primary (click-action)="searchRepository()" [label]="'search'"></button-primary>
     </div>
-    <div class="mt-[16px]">
+    <div *ngIf="loadingRepoDetail" class="mt-[16px]">
+        <p>Loading...</p>
+    </div>
+    <div *ngIf="!loadingRepoDetail" class="mt-[16px]">
         <p>Repository Name: </p>
+        <pre>{{repoDetail | json}}</pre>
     </div>
 </div>
