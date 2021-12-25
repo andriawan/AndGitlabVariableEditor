@@ -15,7 +15,6 @@ export class SearchRepositoryComponent implements OnInit {
   @Output('search') emitter = new EventEmitter<SearchResult>();
 
   projectId: string = "";
-  gitlabVariableService: GitlabVariableService;
   loading: boolean = false;
   loadingRepoDetail: boolean = false;
   repoDetail: GitlabProject = {
@@ -25,8 +24,7 @@ export class SearchRepositoryComponent implements OnInit {
     web_url: "",
   }
 
-  constructor(gitlabVariableService: GitlabVariableService) { 
-    this.gitlabVariableService = gitlabVariableService;
+  constructor(private gitlabVariableService: GitlabVariableService) { 
   }
 
   ngOnInit(): void {

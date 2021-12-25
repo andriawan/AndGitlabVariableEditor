@@ -27,4 +27,8 @@ export class ApiService {
   getGitlabOAuthAuthorize(payload: GitlabOauthPayload): string { 
     return `${this.mainUrl}/oauth/authorize?client_id=${payload.client_id}&response_type=${payload.response_type}&redirect_uri=${payload.redirect_uri}`
   }
+
+  postCodeAuthGitlab(): string {
+    return `${this.mainUrl}/oauth/token`;
+  }
 } 

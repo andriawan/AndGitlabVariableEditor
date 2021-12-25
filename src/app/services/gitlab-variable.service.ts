@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { GitlabProject } from '../interfaces/gitlab-project';
@@ -29,6 +29,22 @@ export class GitlabVariableService extends ApiService {
     return this.http.get<GitlabVar[]>(this.getProjectsVariables(id_project), {
       headers: new HttpHeaders({
         "PRIVATE-TOKEN": token
+      })
+    });
+  }
+
+  postOAuthCode(code: string): Observable<any> {
+    const body = new HttpParams()
+      .set('code', code)
+      .set('grant_type', "authorization_code")
+      .set('redirect_uri', this.config.redirectUri)
+      .set('client_id', this.config.clientId)
+      .set('client_secret', this.config.secret);
+    
+    return this.http.post<any>(this.postCodeAuthGitlab(), body, {
+      headers: new HttpHeaders({
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json"
       })
     });
   }
