@@ -11,7 +11,7 @@
             <p>Repository Name: <a class="underline text-blue-500" [href]="repoDetail.web_url">{{repoDetail.name}}</a></p>
         </div>
         <div>
-            <button-primary (click-action)="searchRepository()" [label]="'Show Value'"></button-primary>
+            <button-primary (click-action)="toggleValueVisibility()" [label]="setLabel()"></button-primary>
         </div>
     </div>
 </div>

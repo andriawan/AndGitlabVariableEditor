@@ -45,7 +45,7 @@ export class LandingPageComponent implements OnInit {
     window.location.replace(this.gitlab.getGitlabOAuthAuthorize({
       client_id: this.config.clientId,
       redirect_uri: this.config.redirectUri,
-      response_type: "code",
+      response_type: this.config.responseType,
     }));
   }
 

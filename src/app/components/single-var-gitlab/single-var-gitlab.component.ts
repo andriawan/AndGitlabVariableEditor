@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { ToggleGitlabValue } from 'src/app/enum/toggle-gitlab-value';
 import { GitlabVar } from 'src/app/interfaces/gitlab-var';
+import { GitlabVariableService } from 'src/app/services/gitlab-variable.service';
 
 @Component({
   selector: 'single-var-gitlab',
@@ -17,9 +19,15 @@ export class SingleVarGitlabComponent implements OnInit {
     masked: false
   };
 
-  constructor() { }
+  inputKeyType:string = ToggleGitlabValue.TEXT;
+  inputValueType:string = ToggleGitlabValue.PASSWORD;
+
+  constructor(private gitlabVarService: GitlabVariableService) { }
 
   ngOnInit(): void {
+    this.gitlabVarService.inputValueVisibilty.subscribe(data => {
+      this.inputValueType = data
+    });
   }
 
 }

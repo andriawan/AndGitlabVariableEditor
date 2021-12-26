@@ -4,5 +4,5 @@ export interface GitlabVar {
     value: string,
     protected: boolean,
     masked: boolean,
-    environment_scope: string
+    environment_scope: string,
 }

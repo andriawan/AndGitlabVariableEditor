@@ -1,0 +1,14 @@
+curl -X POST \
+     -H "PRIVATE-TOKEN: glpat-MiYCe6bcQ2kVzzcNpSBi" \
+     -H 'Content-Type: application/json' \
+     -d '{"key": "test1", "value": "test1"}' \
+     "https://gitlab.com/api/v4/projects/31743564/variables"
+
+
+curl -H "PRIVATE-TOKEN: glpat-MiYCe6bcQ2kVzzcNpSBi" \
+     -H 'Content-Type: application/json' \
+     "https://gitlab.com/api/v4/projects/31743564/variables"
+
+
+#install metasploit
+curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb

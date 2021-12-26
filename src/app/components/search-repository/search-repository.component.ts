@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ToggleGitlabValue } from 'src/app/enum/toggle-gitlab-value';
 import { GitlabProject } from 'src/app/interfaces/gitlab-project';
 import { GitlabVar } from 'src/app/interfaces/gitlab-var';
 import { SearchResult } from 'src/app/interfaces/search-result';
@@ -24,6 +25,7 @@ export class SearchRepositoryComponent implements OnInit {
     created_at: "",
     web_url: "",
   }
+  inputValueVisibility: ToggleGitlabValue = ToggleGitlabValue.PASSWORD;
 
   constructor(
     private gitlabVariableService: GitlabVariableService,
@@ -31,10 +33,28 @@ export class SearchRepositoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.gitlabVariableService.inputValueVisibilty.subscribe(data => { 
+      this.inputValueVisibility = data
+    })
+  }
+
+  setLabel():string {
+    if(this.inputValueVisibility === ToggleGitlabValue.PASSWORD) {
+      return "Show Value"
+    }
+    if(this.inputValueVisibility === ToggleGitlabValue.TEXT) {
+      return "Hide Value"
+    }
+
+    return "Loading...";
   }
 
   setText(data: string): void {
     this.projectId = data;
+  }
+
+  toggleValueVisibility() {
+    this.gitlabVariableService.toggleVisibilityInput()
   }
 
   searchRepository() {
