@@ -11,6 +11,8 @@
             <p>Repository Name: <a class="underline text-blue-500" [href]="repoDetail.web_url">{{repoDetail.name}}</a></p>
         </div>
         <div>
+            <input #file_json (change)="processJSON($event)" type="file" class="hidden" accept="application/json">
+            <button-primary (click-action)="importJSON()" class="mr-2" [label]="'Import from json'"></button-primary>
             <button-primary (click-action)="exportVariableJSON()" class="mr-2" [label]="'Export as json'"></button-primary>
             <button-primary (click-action)="exportVariable()" class="mr-2" [label]="'Export as .env'"></button-primary>
             <button-primary (click-action)="toggleValueVisibility()" [label]="setLabel()"></button-primary>
