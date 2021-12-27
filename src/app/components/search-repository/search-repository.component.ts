@@ -19,6 +19,7 @@ export class SearchRepositoryComponent implements OnInit {
   projectId: string = "";
   loading: boolean = false;
   loadingRepoDetail: boolean = false;
+  private gitlabVarData: GitlabVar[] = [];
   repoDetail: GitlabProject = {
     id: "",
     name: "",
@@ -36,6 +37,39 @@ export class SearchRepositoryComponent implements OnInit {
     this.gitlabVariableService.inputValueVisibilty.subscribe(data => { 
       this.inputValueVisibility = data
     })
+  }
+
+  exportVariable(): void {
+    if (this.gitlabVarData.length === 0) return;
+    let data = this.gitlabVarData.map(value => { 
+      return `${value.key}=${value.value}`
+    }).join("\n")
+
+    let myBlob = new Blob([data], { type: "application/octet-stream" });
+    let blobURL = URL.createObjectURL(myBlob);
+    console.log(blobURL);
+    let href = document.createElement("a");
+    href.href = blobURL;
+    href.download = `env-${this.repoDetail.name}`;
+    href.click();
+  }
+
+  exportVariableJSON(): void {
+    if (this.gitlabVarData.length === 0) return;
+    let data = this.gitlabVarData.map(value => { 
+      return {
+        key: value.key,
+        value: value.value
+      }
+    })
+
+    let myBlob = new Blob([JSON.stringify(data)], { type: "application/json" });
+    let blobURL = URL.createObjectURL(myBlob);
+    console.log(blobURL);
+    let href = document.createElement("a");
+    href.href = blobURL;
+    href.download = `data-var-${this.repoDetail.name}`;
+    href.click();
   }
 
   setLabel():string {
@@ -63,7 +97,11 @@ export class SearchRepositoryComponent implements OnInit {
     this.loadingRepoDetail = true;
     this.emitter.emit({ loading: this.loading })
     this.gitlabVariableService.getProjectVar(this.projectId, "glpat-MiYCe6bcQ2kVzzcNpSBi").subscribe({
-      next: (data: GitlabVar[]) => { this.loading = false; this.emitter.emit({ loading: this.loading, data: data }) },
+      next: (data: GitlabVar[]) => {
+        this.loading = false;
+        this.emitter.emit({ loading: this.loading, data: data })
+        this.gitlabVarData = data;
+      },
       error: (error: HttpErrorResponse) => { this.loading = false; this.emitter.emit({ loading: this.loading, error: error }) }
     });
     this.gitlabToken.getToken();
