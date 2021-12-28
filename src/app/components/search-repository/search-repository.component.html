@@ -3,10 +3,10 @@
         <input-primary [placeholder]="'PROJECT ID'" (change)="setText($event)" class="flex-1"></input-primary>
         <button-primary (click-action)="searchRepository()" [label]="'search'"></button-primary>
     </div>
-    <div *ngIf="loadingRepoDetail" class="mt-[16px]">
+    <div *ngIf="loading.projectInfo" class="mt-[16px]">
         <p>Loading...</p>
     </div>
-    <div *ngIf="!loadingRepoDetail" class="mt-[16px] flex items-center w-full">
+    <div *ngIf="!loading.projectInfo && repoDetail.id && !error.projectInfo" class="mt-[16px] flex items-center w-full">
         <div class="flex-1">
             <p>Repository Name: <a class="underline text-blue-500" [href]="repoDetail.web_url">{{repoDetail.name}}</a></p>
         </div>

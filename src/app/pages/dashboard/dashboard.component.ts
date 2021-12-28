@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { SearchResult } from 'src/app/interfaces/search-result';
+import { ErrorStateGitlabVar } from 'src/app/interfaces/error-state-gitlab-var';
+import { GitlabVar } from 'src/app/interfaces/gitlab-var';
+import { LoadingStateGitlabVar } from 'src/app/interfaces/loading-state-gitlab-var';
+import { GitlabVariableService } from 'src/app/services/gitlab-variable.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,14 +11,19 @@ import { SearchResult } from 'src/app/interfaces/search-result';
 })
 export class DashboardComponent implements OnInit {
 
-  result: SearchResult = {loading : false};
+  variableGitlabList: GitlabVar[] = [];
+  loading: LoadingStateGitlabVar;
+  error: ErrorStateGitlabVar;
 
-  constructor() { }
+  constructor(private gitlabVarService: GitlabVariableService) {
+    this.error = this.gitlabVarService.getErrorState();
+    this.loading = this.gitlabVarService.getLoadingState();
+   }
 
-  ngOnInit(): void {}
-
-  setResult(data: SearchResult): void {
-    this.result = data
+  ngOnInit(): void {
+    this.gitlabVarService.listGitlabVar.subscribe(data => this.variableGitlabList = data);
+    this.gitlabVarService.loadingState.subscribe(data => this.loading = data);
+    this.gitlabVarService.errorState
+      .subscribe(data => this.error = data);
   }
-
 }

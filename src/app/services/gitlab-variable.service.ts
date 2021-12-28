@@ -1,10 +1,12 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ToggleGitlabValue } from '../enum/toggle-gitlab-value';
+import { ErrorStateGitlabVar } from '../interfaces/error-state-gitlab-var';
 import { GitlabProject } from '../interfaces/gitlab-project';
 import { GitlabUser } from '../interfaces/gitlab-user';
 import { GitlabVar } from '../interfaces/gitlab-var';
+import { LoadingStateGitlabVar } from '../interfaces/loading-state-gitlab-var';
 import { Config } from '../utils/config';
 import { ApiService } from './api.service';
 
@@ -14,9 +16,20 @@ import { ApiService } from './api.service';
 export class GitlabVariableService extends ApiService {
   config: Config;
   private _inputValueVisibilty$: BehaviorSubject<ToggleGitlabValue> = new BehaviorSubject<ToggleGitlabValue>(ToggleGitlabValue.PASSWORD); ;
-  private _listGitlabVar$: BehaviorSubject<GitlabVar[]> = new BehaviorSubject<GitlabVar[]>([]); ;
+  private _listGitlabVar$: BehaviorSubject<GitlabVar[]> = new BehaviorSubject<GitlabVar[]>([]);
+  private _loadingState$: BehaviorSubject<LoadingStateGitlabVar> = new BehaviorSubject<LoadingStateGitlabVar>({
+    projectInfo: false,
+    variable: false
+  });
+  private _errorState$: BehaviorSubject<ErrorStateGitlabVar> = new BehaviorSubject<ErrorStateGitlabVar>({
+    projectInfo: undefined,
+    variable: undefined
+  });
+
   public inputValueVisibilty: Observable<ToggleGitlabValue> = this._inputValueVisibilty$.asObservable();
   public listGitlabVar: Observable<GitlabVar[]> = this._listGitlabVar$.asObservable();
+  public loadingState: Observable<LoadingStateGitlabVar> = this._loadingState$.asObservable();
+  public errorState: Observable<ErrorStateGitlabVar> = this._errorState$.asObservable();
 
   constructor(private http: HttpClient, config: Config) { 
     super();
@@ -31,8 +44,32 @@ export class GitlabVariableService extends ApiService {
     });
   }
 
+  setLoadingState(key: string, value: boolean): void {
+    let state = this._loadingState$.getValue();
+    state[key] = value;
+    this._loadingState$.next(state);
+  }
+
+  setErrorState(key: string, value: HttpErrorResponse | undefined): void {
+    let state = this._errorState$.getValue();
+    state[key] = value;
+    this._errorState$.next(state);
+  }
+
+  getLoadingState(): LoadingStateGitlabVar { 
+    return this._loadingState$.getValue();
+  }
+
+  getErrorState(): ErrorStateGitlabVar { 
+    return this._errorState$.getValue();
+  }
+
   setGitlabVarList(listData: GitlabVar[]):void {
     this._listGitlabVar$.next(listData);
+  }
+
+  getGitlabVarList():GitlabVar[] {
+    return this._listGitlabVar$.getValue()
   }
 
   clearGitlabVarList():void {
@@ -42,6 +79,11 @@ export class GitlabVariableService extends ApiService {
   setSingleGitlabVar(item: GitlabVar):void {
     let list = this._listGitlabVar$.getValue();
     list.push(item);
+  }
+
+  updateSingleGitlabVar(index:number, item: GitlabVar):void {
+    let list = this._listGitlabVar$.getValue();
+    list[index] = item;
   }
 
   removeGitlabVar(index: number | number[]): void {
@@ -70,7 +112,7 @@ export class GitlabVariableService extends ApiService {
   getProjectVar(id_project: string, token: string):Observable<GitlabVar[]> {
     return this.http.get<GitlabVar[]>(this.getProjectsVariables(id_project), {
       headers: new HttpHeaders({
-        "PRIVATE-TOKEN": token
+        Authorization: `Bearer ${token}`
       })
     });
   }

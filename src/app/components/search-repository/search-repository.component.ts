@@ -1,9 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { ToggleGitlabValue } from 'src/app/enum/toggle-gitlab-value';
+import { ErrorStateGitlabVar } from 'src/app/interfaces/error-state-gitlab-var';
 import { GitlabProject } from 'src/app/interfaces/gitlab-project';
 import { GitlabVar } from 'src/app/interfaces/gitlab-var';
-import { SearchResult } from 'src/app/interfaces/search-result';
+import { LoadingStateGitlabVar } from 'src/app/interfaces/loading-state-gitlab-var';
 import { GitlabTokenService } from 'src/app/services/gitlab-token.service';
 import { GitlabVariableService } from 'src/app/services/gitlab-variable.service';
 
@@ -14,11 +15,7 @@ import { GitlabVariableService } from 'src/app/services/gitlab-variable.service'
 })
 export class SearchRepositoryComponent implements OnInit {
 
-  @Output('search') emitter = new EventEmitter<SearchResult>();
-
   projectId: string = "";
-  loading: boolean = false;
-  loadingRepoDetail: boolean = false;
   private gitlabVarData: GitlabVar[] = [];
   repoDetail: GitlabProject = {
     id: "",
@@ -26,12 +23,16 @@ export class SearchRepositoryComponent implements OnInit {
     created_at: "",
     web_url: "",
   }
+  loading: LoadingStateGitlabVar;
+  error: ErrorStateGitlabVar;
   inputValueVisibility: ToggleGitlabValue = ToggleGitlabValue.PASSWORD;
   @ViewChild("file_json") input: ElementRef | undefined;
 
   constructor(
     private gitlabVariableService: GitlabVariableService,
     private gitlabToken: GitlabTokenService) { 
+    this.error = this.gitlabVariableService.getErrorState();
+    this.loading = this.gitlabVariableService.getLoadingState();
   }
 
   ngOnInit(): void {
@@ -130,22 +131,33 @@ export class SearchRepositoryComponent implements OnInit {
 
   searchRepository() {
     if (!this.projectId) return;
-    this.loading = true;
-    this.loadingRepoDetail = true;
-    this.emitter.emit({ loading: this.loading })
-    this.gitlabVariableService.getProjectVar(this.projectId, "glpat-MiYCe6bcQ2kVzzcNpSBi").subscribe({
-      next: (data: GitlabVar[]) => {
-        this.loading = false;
-        this.emitter.emit({ loading: this.loading, data: data })
-        this.gitlabVarData = data;
-      },
-      error: (error: HttpErrorResponse) => { this.loading = false; this.emitter.emit({ loading: this.loading, error: error }) }
-    });
+    this.gitlabVariableService.setLoadingState("projectInfo", true);
+    this.gitlabVariableService.setLoadingState("variable", true);
+    this.gitlabVariableService.setErrorState("projectInfo", undefined);
+    this.gitlabVariableService.setErrorState("variable", undefined);
+
     this.gitlabToken.getToken();
     this.gitlabToken.gitlabToken$.subscribe(data => { 
+      this.gitlabVariableService.getProjectVar(this.projectId, data.access_token).subscribe({
+        next: (data: GitlabVar[]) => {
+          this.gitlabVariableService.setLoadingState("variable", false);
+          this.gitlabVariableService.setGitlabVarList(data);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.gitlabVariableService.setLoadingState("variable", false);
+          this.gitlabVariableService.setErrorState("variable", error);
+        }
+      });
+
       this.gitlabVariableService.getProject(this.projectId, data.access_token).subscribe({
-        next: (data: GitlabProject) => { this.loadingRepoDetail = false; this.repoDetail = data;},
-        error: (error: HttpErrorResponse) => { this.loadingRepoDetail = false; this.repoDetail.error = error; }
+        next: (data: GitlabProject) => {
+          this.gitlabVariableService.setLoadingState("projectInfo", false);
+          this.repoDetail = data;
+        },
+        error: (error: HttpErrorResponse) => {
+          this.gitlabVariableService.setLoadingState("projectInfo", false);
+          this.gitlabVariableService.setErrorState("projectInfo", error);
+        }
       })
     })
   }
