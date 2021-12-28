@@ -14,7 +14,9 @@ import { ApiService } from './api.service';
 export class GitlabVariableService extends ApiService {
   config: Config;
   private _inputValueVisibilty$: BehaviorSubject<ToggleGitlabValue> = new BehaviorSubject<ToggleGitlabValue>(ToggleGitlabValue.PASSWORD); ;
+  private _listGitlabVar$: BehaviorSubject<GitlabVar[]> = new BehaviorSubject<GitlabVar[]>([]); ;
   public inputValueVisibilty: Observable<ToggleGitlabValue> = this._inputValueVisibilty$.asObservable();
+  public listGitlabVar: Observable<GitlabVar[]> = this._listGitlabVar$.asObservable();
 
   constructor(private http: HttpClient, config: Config) { 
     super();
@@ -27,6 +29,32 @@ export class GitlabVariableService extends ApiService {
         Authorization: `Bearer ${token}`
       })
     });
+  }
+
+  setGitlabVarList(listData: GitlabVar[]):void {
+    this._listGitlabVar$.next(listData);
+  }
+
+  clearGitlabVarList():void {
+    this._listGitlabVar$.next([]);
+  }
+
+  setSingleGitlabVar(item: GitlabVar):void {
+    let list = this._listGitlabVar$.getValue();
+    list.push(item);
+  }
+
+  removeGitlabVar(index: number | number[]): void {
+    let list = this._listGitlabVar$.getValue();
+    let newList;
+    if (Array.isArray(index)) {
+      newList = list.filter((_val, indexVal) => {
+        return !index.includes(indexVal);
+      })
+      this._listGitlabVar$.next(newList);
+    } else {
+      list.splice(index, 1);
+    }
   }
 
   toggleVisibilityInput() {
