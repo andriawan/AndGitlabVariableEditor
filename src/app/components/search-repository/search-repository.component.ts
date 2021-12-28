@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Subscription, take } from 'rxjs';
 import { ToggleGitlabValue } from 'src/app/enum/toggle-gitlab-value';
 import { ErrorStateGitlabVar } from 'src/app/interfaces/error-state-gitlab-var';
 import { GitlabProject } from 'src/app/interfaces/gitlab-project';
@@ -13,7 +14,7 @@ import { GitlabVariableService } from 'src/app/services/gitlab-variable.service'
   templateUrl: './search-repository.component.html',
   styleUrls: ['./search-repository.component.scss']
 })
-export class SearchRepositoryComponent implements OnInit {
+export class SearchRepositoryComponent implements OnInit, OnDestroy {
 
   projectId: string = "";
   private gitlabVarData: GitlabVar[] = [];
@@ -27,6 +28,7 @@ export class SearchRepositoryComponent implements OnInit {
   error: ErrorStateGitlabVar;
   inputValueVisibility: ToggleGitlabValue = ToggleGitlabValue.PASSWORD;
   @ViewChild("file_json") input: ElementRef | undefined;
+  subscription: Subscription = new Subscription();
 
   constructor(
     private gitlabVariableService: GitlabVariableService,
@@ -34,13 +36,17 @@ export class SearchRepositoryComponent implements OnInit {
     this.error = this.gitlabVariableService.getErrorState();
     this.loading = this.gitlabVariableService.getLoadingState();
   }
-
-  ngOnInit(): void {
-    this.gitlabVariableService.inputValueVisibilty.subscribe(data => { 
-      this.inputValueVisibility = data
-    })
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
+  ngOnInit(): void {
+    this.subscription.add(this.gitlabVariableService.inputValueVisibilty.subscribe(data => {
+      console.log("sub");
+      this.inputValueVisibility = data
+    }));
+  }
+  
   importJSON() {
     this.input?.nativeElement.click();
   }
@@ -73,7 +79,6 @@ export class SearchRepositoryComponent implements OnInit {
       if (processedData.length <= 0) { 
         throw Error(`not valid json. please provide object like {"key" : "sample", "value": "sample"}`)
       }
-      console.log(processedData)
     } catch (error) {
       window.alert(error);
     }
@@ -136,30 +141,30 @@ export class SearchRepositoryComponent implements OnInit {
     this.gitlabVariableService.setErrorState("projectInfo", undefined);
     this.gitlabVariableService.setErrorState("variable", undefined);
 
-    this.gitlabToken.getToken();
-    this.gitlabToken.gitlabToken$.subscribe(data => { 
-      this.gitlabVariableService.getProjectVar(this.projectId, data.access_token).subscribe({
-        next: (data: GitlabVar[]) => {
-          this.gitlabVariableService.setLoadingState("variable", false);
-          this.gitlabVariableService.setGitlabVarList(data);
-        },
-        error: (error: HttpErrorResponse) => {
-          this.gitlabVariableService.setLoadingState("variable", false);
-          this.gitlabVariableService.setErrorState("variable", error);
-        }
-      });
+    let tokenData = this.gitlabToken.getTokenSync();
 
-      this.gitlabVariableService.getProject(this.projectId, data.access_token).subscribe({
-        next: (data: GitlabProject) => {
-          this.gitlabVariableService.setLoadingState("projectInfo", false);
-          this.repoDetail = data;
-        },
-        error: (error: HttpErrorResponse) => {
-          this.gitlabVariableService.setLoadingState("projectInfo", false);
-          this.gitlabVariableService.setErrorState("projectInfo", error);
-        }
-      })
-    })
+    this.gitlabVariableService.getProjectVar(this.projectId, tokenData.access_token).subscribe({
+      next: (data: GitlabVar[]) => {
+        this.gitlabVariableService.setLoadingState("variable", false);
+        this.gitlabVariableService.setGitlabVarList(data);
+        this.gitlabVarData = this.gitlabVariableService.getGitlabVarList();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.gitlabVariableService.setLoadingState("variable", false);
+        this.gitlabVariableService.setErrorState("variable", error);
+      }
+    });
+    
+    this.gitlabVariableService.getProject(this.projectId, tokenData.access_token).subscribe({
+      next: (data: GitlabProject) => {
+        this.gitlabVariableService.setLoadingState("projectInfo", false);
+        this.repoDetail = data;
+      },
+      error: (error: HttpErrorResponse) => {
+        this.gitlabVariableService.setLoadingState("projectInfo", false);
+        this.gitlabVariableService.setErrorState("projectInfo", error);
+      }
+    });
   }
 
 }

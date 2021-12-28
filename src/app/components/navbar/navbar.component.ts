@@ -25,15 +25,16 @@ export class NavbarComponent implements OnInit {
     private gitlab: GitlabVariableService) { }
 
   ngOnInit(): void {
-    this.token.gitlabToken$.subscribe(data => { 
-      if (!data.access_token) {
-        this.router.navigate(['/']);
-        return;
-      }
-      this.gitlab.getLoggedUser(data.access_token).subscribe(data => { 
+    let data = this.token.getTokenSync();
+    if (!data.access_token) {
+      this.router.navigate(['/']);
+      return;
+    }
+    if (this.gitlabUser.id == "") { 
+      this.gitlab.getLoggedUser(data.access_token).subscribe(data => {
         this.gitlabUser = data;
       })
-    })
+    }
   }
 
   goToLandingPage(): void{

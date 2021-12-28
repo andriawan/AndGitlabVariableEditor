@@ -28,6 +28,10 @@ export class GitlabTokenService {
     this._gitlabToken$.next(data);
   }
 
+  getTokenSync(): GitlabToken {
+    return this.localData.getTokenData(this.LABEL)
+  }
+
   setToken(data: GitlabToken): void {
     this.localData.setTokenData(this.LABEL, data);
     this._gitlabToken$.next(data);
