@@ -20,6 +20,10 @@ export class ApiService {
     return `${this.url}${this.version}/projects/${id}`
   }
 
+  getAllProjects(id_user:string):string{
+    return `${this.url}${this.version}/users/${id_user}/projects`
+  }
+
   getLogin():string{
     return `${this.url}/oauth/token`
   }
@@ -34,5 +38,17 @@ export class ApiService {
 
   getUser(): string {
     return `${this.url}${this.version}/user`;
+  }
+
+  createNewVar(id_project: string) {
+    return `${this.url}${this.version}/projects/${id_project}/variables`
+  }
+
+  updateVar(id_project: string, key:string) {
+    return `${this.url}${this.version}/projects/${id_project}/variables/${key}`
+  }
+
+  removeVar(id_project: string, key:string) {
+    return `${this.url}${this.version}/projects/${id_project}/variables/${key}`
   }
 } 

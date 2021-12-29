@@ -1,8 +1,9 @@
 <div class="flex flex-col items-center py-6">
     <div class="flex w-full flex-row">
-        <input-primary [placeholder]="'PROJECT ID'" (change)="setText($event)" class="flex-1"></input-primary>
+        <input-primary [value]="projectId" [placeholder]="'PROJECT ID'" (change_value)="setText($event)" class="flex-1"></input-primary>
         <button-primary (click-action)="searchRepository()" [label]="'search'"></button-primary>
     </div>
+    <div *ngFor="let projects of gitlabProjectsDataFiltered">{{ projects.name}}</div>
     <div *ngIf="loading.projectInfo" class="mt-[16px]">
         <p>Loading...</p>
     </div>

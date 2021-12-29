@@ -17,6 +17,7 @@ export class GitlabVariableService extends ApiService {
   config: Config;
   private _inputValueVisibilty$: BehaviorSubject<ToggleGitlabValue> = new BehaviorSubject<ToggleGitlabValue>(ToggleGitlabValue.PASSWORD); ;
   private _listGitlabVar$: BehaviorSubject<GitlabVar[]> = new BehaviorSubject<GitlabVar[]>([]);
+  private _listGitlabProjects$: BehaviorSubject<GitlabProject[]> = new BehaviorSubject<GitlabProject[]>([]);
   private _loadingState$: BehaviorSubject<LoadingStateGitlabVar> = new BehaviorSubject<LoadingStateGitlabVar>({
     projectInfo: false,
     variable: false
@@ -28,8 +29,10 @@ export class GitlabVariableService extends ApiService {
 
   public inputValueVisibilty: Observable<ToggleGitlabValue> = this._inputValueVisibilty$.asObservable();
   public listGitlabVar: Observable<GitlabVar[]> = this._listGitlabVar$.asObservable();
+  public listGitlabProjects: Observable<GitlabProject[]> = this._listGitlabProjects$.asObservable();
   public loadingState: Observable<LoadingStateGitlabVar> = this._loadingState$.asObservable();
   public errorState: Observable<ErrorStateGitlabVar> = this._errorState$.asObservable();
+  public projectId: string = "";
 
   constructor(private http: HttpClient, config: Config) { 
     super();
@@ -56,6 +59,14 @@ export class GitlabVariableService extends ApiService {
     this._errorState$.next(state);
   }
 
+  setProjectId(id: string): void { 
+    this.projectId = id;
+  }
+
+  getProjectId(): string { 
+    return this.projectId;
+  }
+
   getLoadingState(): LoadingStateGitlabVar { 
     return this._loadingState$.getValue();
   }
@@ -68,12 +79,24 @@ export class GitlabVariableService extends ApiService {
     this._listGitlabVar$.next(listData);
   }
 
+  setGitlabProjectsist(listData: GitlabProject[]):void {
+    this._listGitlabProjects$.next(listData);
+  }
+
   getGitlabVarList():GitlabVar[] {
     return this._listGitlabVar$.getValue()
   }
 
+  getGitlabProjectsList():GitlabProject[] {
+    return this._listGitlabProjects$.getValue()
+  }
+
   clearGitlabVarList():void {
     this._listGitlabVar$.next([]);
+  }
+
+  clearGitlabProjectsList():void {
+    this._listGitlabProjects$.next([]);
   }
 
   setSingleGitlabVar(item: GitlabVar):void {
@@ -86,12 +109,17 @@ export class GitlabVariableService extends ApiService {
     list[index] = item;
   }
 
-  removeGitlabVar(index: number | number[]): void {
+  removeGitlabVar(index: number | number[]| string): void {
     let list = this._listGitlabVar$.getValue();
     let newList;
     if (Array.isArray(index)) {
       newList = list.filter((_val, indexVal) => {
         return !index.includes(indexVal);
+      })
+      this._listGitlabVar$.next(newList);
+    } else if(typeof(index) === 'string') {
+      newList = list.filter(val => {
+        return val.key !== index;
       })
       this._listGitlabVar$.next(newList);
     } else {
@@ -117,6 +145,14 @@ export class GitlabVariableService extends ApiService {
     });
   }
 
+  getAllProjectsList(id_user:string, token: string):Observable<GitlabProject[]> {
+    return this.http.get<GitlabProject[]>(this.getAllProjects(id_user), {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    });
+  }
+
   postOAuthCode(code: string): Observable<any> {
     const body = new HttpParams()
       .set('code', code)
@@ -129,6 +165,30 @@ export class GitlabVariableService extends ApiService {
       headers: new HttpHeaders({
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json"
+      })
+    });
+  }
+
+  createNewGitlabVar(id_project: string, token: string, item: GitlabVar): Observable<GitlabVar> {
+    return this.http.post<GitlabVar>(this.createNewVar(id_project), item, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    });
+  }
+
+  updateGitlabVar(id_project: string, token: string, item: GitlabVar): Observable<GitlabVar> {
+    return this.http.put<GitlabVar>(this.updateVar(id_project, item.key), item, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    });
+  }
+
+  removeSingleGitlabVar(id_project: string, token: string, item: GitlabVar): Observable<GitlabVar> {
+    return this.http.delete<GitlabVar>(this.removeVar(id_project, item.key), {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
       })
     });
   }

@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { ErrorStateGitlabVar } from 'src/app/interfaces/error-state-gitlab-var';
 import { GitlabVar } from 'src/app/interfaces/gitlab-var';
 import { LoadingStateGitlabVar } from 'src/app/interfaces/loading-state-gitlab-var';
+import { GitlabTokenService } from 'src/app/services/gitlab-token.service';
 import { GitlabVariableService } from 'src/app/services/gitlab-variable.service';
 
 @Component({
@@ -17,7 +18,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   error: ErrorStateGitlabVar;
   private subscription: Subscription = new Subscription();
 
-  constructor(private gitlabVarService: GitlabVariableService) {
+  constructor(private gitlabVarService: GitlabVariableService,
+    private token: GitlabTokenService) {
     this.error = this.gitlabVarService.getErrorState();
     this.loading = this.gitlabVarService.getLoadingState();
   }
@@ -31,6 +33,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subscription.add(this.gitlabVarService.loadingState.subscribe(data => this.loading = data));
     this.subscription.add(this.gitlabVarService.errorState
       .subscribe(data => this.error = data));
+    let token = this.token.getTokenSync();
   }
 
 }
