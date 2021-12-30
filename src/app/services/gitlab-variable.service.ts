@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ToggleGitlabValue } from '../enum/toggle-gitlab-value';
 import { ErrorStateGitlabVar } from '../interfaces/error-state-gitlab-var';
 import { GitlabProject } from '../interfaces/gitlab-project';
+import { GitlabToken } from '../interfaces/gitlab-token';
 import { GitlabUser } from '../interfaces/gitlab-user';
 import { GitlabVar } from '../interfaces/gitlab-var';
 import { LoadingStateGitlabVar } from '../interfaces/loading-state-gitlab-var';
@@ -158,6 +159,21 @@ export class GitlabVariableService extends ApiService {
       .set('code', code)
       .set('grant_type', this.config.grantType)
       .set('redirect_uri', this.config.redirectUri)
+      .set('client_id', this.config.clientId)
+      .set('client_secret', this.config.secret);
+    
+    return this.http.post<any>(this.postCodeAuthGitlab(), body, {
+      headers: new HttpHeaders({
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json"
+      })
+    });
+  }
+
+  refreshToken(refresh_token: string): Observable<GitlabToken> {
+    const body = new HttpParams()
+      .set('grant_type', this.config.grantTypeRefreshToken)
+      .set('refresh_token', refresh_token)
       .set('client_id', this.config.clientId)
       .set('client_secret', this.config.secret);
     

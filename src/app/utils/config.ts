@@ -9,4 +9,5 @@ export class Config {
     public readonly redirectUri: string = "http://localhost:4200/";
     public readonly responseType: string = "code";
     public readonly grantType: string = "authorization_code";
+    public readonly grantTypeRefreshToken: string = "refresh_token";
 }

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,6 +13,7 @@ import { SearchRepositoryComponent } from './components/search-repository/search
 import { InputPrimaryComponent } from './components/input-primary/input-primary.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SingleVarGitlabComponent } from './components/single-var-gitlab/single-var-gitlab.component';
+import { ApiInterceptor } from './utils/api-interceptor';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,11 @@ import { SingleVarGitlabComponent } from './components/single-var-gitlab/single-
     BrowserAnimationsModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
