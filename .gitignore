@@ -46,3 +46,7 @@ testem.log
 Thumbs.db
 
 *.http
+
+# Local Netlify folder
+.netlify
+.env*

@@ -145,10 +145,10 @@ export class SearchRepositoryComponent implements OnInit, OnDestroy {
 
   setLabel():string {
     if(this.inputValueVisibility === ToggleGitlabValue.PASSWORD) {
-      return "Show Value"
+      return "Show Values"
     }
     if(this.inputValueVisibility === ToggleGitlabValue.TEXT) {
-      return "Hide Value"
+      return "Hide Values"
     }
 
     return "Loading...";

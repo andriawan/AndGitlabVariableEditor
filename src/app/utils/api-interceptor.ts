@@ -4,16 +4,19 @@ import { BehaviorSubject, catchError, filter, finalize, Observable, of, switchMa
 import { GitlabTokenService } from "../services/gitlab-token.service";
 import { GitlabVariableService } from "../services/gitlab-variable.service";
 import { GitlabToken } from "../interfaces/gitlab-token";
+import { Router } from "@angular/router";
 
 
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor{
-
-    token: string = "";
     AUTH_HEADER = 'Authorization';
     private refreshTokenInProgress = false;
     private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
+    constructor(private tokenService: GitlabTokenService,
+        private router: Router,
+        private gitlabVarServie: GitlabVariableService) {
+    }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         if (!req.headers.has('Content-Type')) {
@@ -43,6 +46,10 @@ export class ApiInterceptor implements HttpInterceptor{
                                 this.refreshTokenSubject.next(true);
                                 return next.handle(this.addAuthenticationToken(req));
                             }),
+                            catchError((errorFinal: HttpErrorResponse) => { 
+                                this.router.navigate(['/'])
+                                return throwError(() => new Error(errorFinal.message));
+                            }),
                             finalize(() => this.refreshTokenInProgress = false)
                         );
                         
@@ -54,20 +61,17 @@ export class ApiInterceptor implements HttpInterceptor{
         )
     }
 
-    constructor(private tokenService:GitlabTokenService, private gitlabVarServie:GitlabVariableService) {
-        this.token = tokenService.getTokenSync().access_token;
-    }
-
     private refreshAccessToken(): Observable<GitlabToken> {
         return this.gitlabVarServie.refreshToken(this.tokenService.getTokenSync().refresh_token)
     }
 
     private addAuthenticationToken(request: HttpRequest<any>): HttpRequest<any> {
-        if (!this.token) {
+        let token = this.tokenService.getTokenSync().access_token;
+        if (!token) {
            return request;
         }
         return request.clone({
-            headers: request.headers.set(this.AUTH_HEADER, "Bearer " + this.token)
+            headers: request.headers.set(this.AUTH_HEADER, "Bearer " + token)
         });
     }
 }

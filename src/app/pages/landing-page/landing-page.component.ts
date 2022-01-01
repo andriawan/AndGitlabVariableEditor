@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { GitlabTokenService } from 'src/app/services/gitlab-token.service';
 import { GitlabVariableService } from 'src/app/services/gitlab-variable.service';
 import { Config } from 'src/app/utils/config';
@@ -11,11 +12,13 @@ import { Config } from 'src/app/utils/config';
 })
 export class LandingPageComponent implements OnInit {
 
+  subscription: Subscription = new Subscription();
+
   constructor(private gitlab: GitlabVariableService,
     private config: Config,
     private activeRouter: ActivatedRoute,
     private router: Router,
-    private token: GitlabTokenService ) { 
+    private token: GitlabTokenService) { 
   }
 
   ngOnInit(): void {
@@ -24,7 +27,7 @@ export class LandingPageComponent implements OnInit {
   }
 
   checkCodeAuth(): void {
-    this.token.gitlabToken$.subscribe(data => {
+    this.subscription.add(this.token.gitlabToken$.subscribe(data => {
       if (data.access_token) {
         this.router.navigate(["/dashboard"]);
       } else {
@@ -33,12 +36,13 @@ export class LandingPageComponent implements OnInit {
           if (code) {
             this.gitlab.postOAuthCode(code).subscribe(data => {
               this.token.setToken(data);
+              this.subscription.unsubscribe();
             });
           }
         });
         
       }
-    })
+    }));
   }
 
   authorize():void {

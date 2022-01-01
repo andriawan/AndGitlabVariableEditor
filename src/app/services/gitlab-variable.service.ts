@@ -155,14 +155,8 @@ export class GitlabVariableService extends ApiService {
   }
 
   postOAuthCode(code: string): Observable<any> {
-    const body = new HttpParams()
-      .set('code', code)
-      .set('grant_type', this.config.grantType)
-      .set('redirect_uri', this.config.redirectUri)
-      .set('client_id', this.config.clientId)
-      .set('client_secret', this.config.secret);
-    
-    return this.http.post<any>(this.postCodeAuthGitlab(), body, {
+    const body = { code, grant_type: this.config.grantType };
+    return this.http.post<any>("/api/oauth-gitlab", body, {
       headers: new HttpHeaders({
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json"
