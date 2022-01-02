@@ -15,7 +15,7 @@ const handler: Handler = async (event, _context) => {
             client_id: GITLAB_CLIENT_ID || "",
             client_secret: GITLAB_SECRET || "",
             redirect_uri: GITLAB_REDIRECT || "",
-            code: data_post.code || "",
+            refresh_token: data_post.refresh_token || "",
             grant_type: data_post.grant_type || ""
         });
             

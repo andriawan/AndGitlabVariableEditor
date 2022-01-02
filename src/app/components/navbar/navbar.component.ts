@@ -22,7 +22,9 @@ export class NavbarComponent implements OnInit {
 
   constructor(private router: Router,
     private token: GitlabTokenService,
-    private gitlab: GitlabVariableService) { }
+    private gitlab: GitlabVariableService) { 
+    this.gitlabUser = this.gitlab.getGitlabUser();
+    }
 
   ngOnInit(): void {
     let data = this.token.getTokenSync();
@@ -33,6 +35,7 @@ export class NavbarComponent implements OnInit {
     if (this.gitlabUser.id == "") { 
       this.gitlab.getLoggedUser(data.access_token).subscribe(data => {
         this.gitlabUser = data;
+        this.gitlab.setGitlabUser(data);
       })
     }
   }

@@ -15,7 +15,6 @@ export class LandingPageComponent implements OnInit {
   subscription: Subscription = new Subscription();
 
   constructor(private gitlab: GitlabVariableService,
-    private config: Config,
     private activeRouter: ActivatedRoute,
     private router: Router,
     private token: GitlabTokenService) { 
@@ -45,12 +44,10 @@ export class LandingPageComponent implements OnInit {
     }));
   }
 
-  authorize():void {
-    window.location.replace(this.gitlab.getGitlabOAuthAuthorize({
-      client_id: this.config.clientId,
-      redirect_uri: this.config.redirectUri,
-      response_type: this.config.responseType,
-    }));
+  authorize(): void {
+    this.gitlab.redirectAuthGitlab().subscribe(data => {
+      window.location.replace(`${data.url}`);
+    }) 
   }
 
 }

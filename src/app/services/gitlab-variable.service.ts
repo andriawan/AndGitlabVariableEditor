@@ -19,6 +19,14 @@ export class GitlabVariableService extends ApiService {
   private _inputValueVisibilty$: BehaviorSubject<ToggleGitlabValue> = new BehaviorSubject<ToggleGitlabValue>(ToggleGitlabValue.PASSWORD); ;
   private _listGitlabVar$: BehaviorSubject<GitlabVar[]> = new BehaviorSubject<GitlabVar[]>([]);
   private _listGitlabProjects$: BehaviorSubject<GitlabProject[]> = new BehaviorSubject<GitlabProject[]>([]);
+  private _userLogged$: BehaviorSubject<GitlabUser> = new BehaviorSubject<GitlabUser>({
+    id: '',
+    username: '',
+    avatar_url: '',
+    name: '',
+    web_url: '',
+    email: ''
+  });
   private _loadingState$: BehaviorSubject<LoadingStateGitlabVar> = new BehaviorSubject<LoadingStateGitlabVar>({
     projectInfo: false,
     variable: false
@@ -31,6 +39,7 @@ export class GitlabVariableService extends ApiService {
   public inputValueVisibilty: Observable<ToggleGitlabValue> = this._inputValueVisibilty$.asObservable();
   public listGitlabVar: Observable<GitlabVar[]> = this._listGitlabVar$.asObservable();
   public listGitlabProjects: Observable<GitlabProject[]> = this._listGitlabProjects$.asObservable();
+  public gitlabUser: Observable<GitlabUser> = this._userLogged$.asObservable();
   public loadingState: Observable<LoadingStateGitlabVar> = this._loadingState$.asObservable();
   public errorState: Observable<ErrorStateGitlabVar> = this._errorState$.asObservable();
   public projectId: string = "";
@@ -52,6 +61,14 @@ export class GitlabVariableService extends ApiService {
     let state = this._loadingState$.getValue();
     state[key] = value;
     this._loadingState$.next(state);
+  }
+
+  setGitlabUser(user: GitlabUser): void { 
+    this._userLogged$.next(user);
+  }
+
+  getGitlabUser():GitlabUser {
+    return this._userLogged$.getValue()
   }
 
   setErrorState(key: string, value: HttpErrorResponse | undefined): void {
@@ -158,22 +175,26 @@ export class GitlabVariableService extends ApiService {
     const body = { code, grant_type: this.config.grantType };
     return this.http.post<any>("/api/oauth-gitlab", body, {
       headers: new HttpHeaders({
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      })
+    });
+  }
+
+  redirectAuthGitlab(): Observable<any> {
+    return this.http.post<any>("/api/redirect-oauth-gitlab", {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
         "Accept": "application/json"
       })
     });
   }
 
   refreshToken(refresh_token: string): Observable<GitlabToken> {
-    const body = new HttpParams()
-      .set('grant_type', this.config.grantTypeRefreshToken)
-      .set('refresh_token', refresh_token)
-      .set('client_id', this.config.clientId)
-      .set('client_secret', this.config.secret);
-    
-    return this.http.post<any>(this.postCodeAuthGitlab(), body, {
+    const body = { refresh_token, grant_type: this.config.grantTypeRefreshToken };
+    return this.http.post<any>("/api/refresh-token-gitlab", body, {
       headers: new HttpHeaders({
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
         "Accept": "application/json"
       })
     });
