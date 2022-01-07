@@ -114,6 +114,9 @@ export class SearchRepositoryComponent implements OnInit, OnDestroy {
     this.gitlabVarData = this.gitlabVariableService.getGitlabVarList();
     if (this.gitlabVarData.length === 0) return;
     let data = this.gitlabVarData.map(value => { 
+      if (value.value.includes(" ")) { 
+        return `${value.key}="${value.value}"`
+      }
       return `${value.key}=${value.value}`
     }).join("\n")
 
