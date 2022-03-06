@@ -1,11 +1,12 @@
 <div class="min-h-screen relative flex flex-col">
     <navbar class="flex-none sticky top-0"></navbar>
-    <div class="flex-1 overflow-y-auto flex flex-col justify-start max-w-4xl mx-auto container">
-        <search-repository [variableCount]="variableGitlabList.length" (change_value)="setText($event)" class="w-full"></search-repository>
+    <search-repository [variableCount]="variableGitlabList.length" (change_value)="setText($event)" 
+    class="w-full sticky top-[60px] px-4 xl:px-0 max-w-4xl mx-auto container bg-white"></search-repository>
+    <div class="px-4 xl:px-0 flex-1 overflow-y-auto flex flex-col justify-start max-w-4xl mx-auto container">
         <div *ngIf="loading.variable && projectId">
             loading...
         </div>
-        <div *ngIf="!loading.variable && !error.variable && projectId" class="flex flex-col">
+        <div *ngIf="!loading.variable && !error.variable && projectId" class="flex flex-col text-sm xl:text-base">
             <single-var-gitlab *ngFor="let data of variableGitlabList" [item]="data"  class="mb-6"></single-var-gitlab>
         </div>
         <div *ngIf="!loading.variable && error.variable && projectId" class="flex items-center justify-center text-red-500">

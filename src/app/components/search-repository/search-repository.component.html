@@ -1,4 +1,4 @@
-<div class="flex flex-col items-center py-6">
+<div class="flex flex-col items-center py-6 text-sm xl:text-base">
     <div class="flex w-full flex-row">
         <input-primary [value]="projectId" [placeholder]="'PROJECT ID'" (change_value)="setText($event)" class="flex-1"></input-primary>
         <button-primary (click-action)="searchRepository()" [label]="'search'"></button-primary>
@@ -10,17 +10,19 @@
     <div *ngIf="loading.projectInfo && projectId" class="mt-[16px]">
         <p>Loading...</p>
     </div>
-    <div *ngIf="!loading.projectInfo && repoDetail.id && !error.projectInfo && projectId" class="mt-[16px] flex items-center w-full">
-        <div class="flex-1">
+    <div *ngIf="!loading.projectInfo && repoDetail.id && !error.projectInfo && projectId" class="mt-[16px] flex lg:flex-row flex-col lg:items-center w-full">
+        <div class="lg:flex-1 pb-4 lg:pb-0">
             <p>Repository Name: <a class="underline text-blue-500 font-bold" [href]="repoDetail.web_url">{{repoDetail.name}}</a></p>
             <p>There are <span class="text-orange-500 font-bold">{{variableCount}}</span> Variable(s)</p>
         </div>
-        <div>
-            <input #file_json (change)="processJSON($event)" type="file" class="hidden" accept="application/json">
-            <button-primary (click-action)="importJSON()" class="mr-2" [label]="'Import from json'"></button-primary>
-            <button-primary (click-action)="exportVariableJSON()" class="mr-2" [label]="'Export as json'"></button-primary>
-            <button-primary (click-action)="exportVariable()" class="mr-2" [label]="'Export as .env'"></button-primary>
-            <button-primary (click-action)="toggleValueVisibility()" [label]="setLabel()"></button-primary>
+        <div class="lg:flex-none flex lg:overflow-hidden overflow-x-scroll">
+            <div class="lg:flex-none flex lg:flex-wrap flex-nowrap">
+                <input #file_json (change)="processJSON($event)" type="file" class="hidden" accept="application/json">
+                <button-primary (click-action)="importJSON()" class="mr-2 whitespace-nowrap" [label]="'Import from json'"></button-primary>
+                <button-primary (click-action)="exportVariableJSON()" class="mr-2 whitespace-nowrap" [label]="'Export as json'"></button-primary>
+                <button-primary (click-action)="exportVariable()" class="mr-2 whitespace-nowrap" [label]="'Export as .env'"></button-primary>
+                <button-primary (click-action)="toggleValueVisibility()" class="whitespace-nowrap" [label]="setLabel()"></button-primary>
+            </div>
         </div>
     </div>
 </div>
