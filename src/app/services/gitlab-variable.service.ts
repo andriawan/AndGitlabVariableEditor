@@ -157,6 +157,7 @@ export class GitlabVariableService extends ApiService {
 
   getProjectVar(id_project: string, token: string):Observable<GitlabVar[]> {
     return this.http.get<GitlabVar[]>(this.getProjectsVariables(id_project), {
+      params: new HttpParams().set('per_page', this.config.perPageVariables),
       headers: new HttpHeaders({
         Authorization: `Bearer ${token}`
       })
