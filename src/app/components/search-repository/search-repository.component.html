@@ -4,12 +4,16 @@
         <button-primary (click-action)="searchRepository()" [label]="'search'"></button-primary>
     </div>
     <div *ngFor="let projects of gitlabProjectsDataFiltered">{{ projects.name}}</div>
-    <div *ngIf="loading.projectInfo" class="mt-[16px]">
+    <div *ngIf="!projectId" class="mt-[16px]">
+        <p>Please input Project ID first</p>
+    </div>
+    <div *ngIf="loading.projectInfo && projectId" class="mt-[16px]">
         <p>Loading...</p>
     </div>
-    <div *ngIf="!loading.projectInfo && repoDetail.id && !error.projectInfo" class="mt-[16px] flex items-center w-full">
+    <div *ngIf="!loading.projectInfo && repoDetail.id && !error.projectInfo && projectId" class="mt-[16px] flex items-center w-full">
         <div class="flex-1">
-            <p>Repository Name: <a class="underline text-blue-500" [href]="repoDetail.web_url">{{repoDetail.name}}</a></p>
+            <p>Repository Name: <a class="underline text-blue-500 font-bold" [href]="repoDetail.web_url">{{repoDetail.name}}</a></p>
+            <p>There are <span class="text-orange-500 font-bold">{{variableCount}}</span> Variable(s)</p>
         </div>
         <div>
             <input #file_json (change)="processJSON($event)" type="file" class="hidden" accept="application/json">

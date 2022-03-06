@@ -16,10 +16,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   variableGitlabList: GitlabVar[] = [];
   loading: LoadingStateGitlabVar;
   error: ErrorStateGitlabVar;
+  projectId: string = "";
   private subscription: Subscription = new Subscription();
 
-  constructor(private gitlabVarService: GitlabVariableService,
-    private token: GitlabTokenService) {
+  constructor(private gitlabVarService: GitlabVariableService) {
     this.error = this.gitlabVarService.getErrorState();
     this.loading = this.gitlabVarService.getLoadingState();
   }
@@ -27,13 +27,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
+  
 
   ngOnInit(): void {
     this.subscription.add(this.gitlabVarService.listGitlabVar.subscribe(data => this.variableGitlabList = data));
     this.subscription.add(this.gitlabVarService.loadingState.subscribe(data => this.loading = data));
     this.subscription.add(this.gitlabVarService.errorState
       .subscribe(data => this.error = data));
-    let token = this.token.getTokenSync();
+  }
+
+  setText(data: string): void {
+    this.projectId = data;
   }
 
 }

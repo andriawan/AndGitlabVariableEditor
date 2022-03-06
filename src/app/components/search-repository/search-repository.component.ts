@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Subscription, switchMap, take, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { ToggleGitlabValue } from 'src/app/enum/toggle-gitlab-value';
 import { ErrorStateGitlabVar } from 'src/app/interfaces/error-state-gitlab-var';
 import { GitlabProject } from 'src/app/interfaces/gitlab-project';
@@ -31,6 +31,8 @@ export class SearchRepositoryComponent implements OnInit, OnDestroy {
   inputValueVisibility: ToggleGitlabValue = ToggleGitlabValue.PASSWORD;
   signal: Subject<string> = new Subject<string>();
   @ViewChild("file_json") input: ElementRef | undefined;
+  @Input() variableCount: number = 0;
+  @Output("change_value") emitter = new EventEmitter<string>();
   subscription: Subscription = new Subscription();
 
   constructor(
@@ -161,6 +163,7 @@ export class SearchRepositoryComponent implements OnInit, OnDestroy {
     this.projectId = data;
     this.signal.next(data);
     this.gitlabVariableService.setProjectId(data);
+    this.emitter.emit(data);
     this.router.navigate(['.'], {
       relativeTo: this.activeRouter,
       queryParams: { project_id: data }
